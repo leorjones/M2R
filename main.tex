@@ -1,0 +1,966 @@
+\documentclass{article}
+\usepackage{graphicx, caption, indentfirst, amsfonts, amsmath, amssymb, amsthm, setspace}
+\usepackage[margin=1in]{geometry}
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{property}[theorem]{Property}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{proposition}{Proposition}[section]
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage{comment}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{biblatex}
+\addbibresource{reference.bib}
+
+
+\title{Convergence of lattice sums}
+\author{Tyler Clayton, Yushan Hu, Leo Jones, Yaguang Li, Meng Sun}
+\date{June 2023}
+\doublespacing
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\begin{abstract}
+This report mainly investigates the convergence behaviour of the series $\sideset{}{'}\sum_{(i, j, k) \in \mathbb{Z}^3} \frac{(-1)^{i+j+k}}{\left(i^2+j^2+k^2\right)^{1 / 2}}$ with different summation methods. Specifically, we examine the convergence or divergence under rectangle, spherical, and Cesàro (including first and second-order) summation methods. The convergence rates associated with the methods leading to convergence were further assessed quantitatively. Moreover, we explore the applicability of similar analytical approaches to assess the convergence of various more general lattice sums encountered in a broader context.
+\end{abstract}
+
+\section{Introduction}
+
+
+% 定义vector, 一种特殊的summation method 是 multiple indexes
+Lattice sums, also known as multidimensional series (of order $d = 1,2, 3, ...$) are expressions of the form:
+\begin{equation}
+\sum_{\mathbf{l}} F(\mathbf{l})
+\end{equation}
+where the vector $\mathbf{l}$ ranges over a $d$-dimensional lattice.
+
+On the other hand, if we expand the vector over $d$ dimensions, we get a more understandable formula:
+
+\begin{equation}
+\sum_{\underbrace{i, j, k, ...}_{\text{d items}}=-\infty}^{\infty} a(\underbrace{i, j, k, ...}_{\text{d=n}})
+\end{equation}
+where $(a(i, j, k, ...))_{(i, j, k, ...)} \in \mathbb{Z}^d$ is any ordered sequence of terms, such as numbers, functions, abelian groups or anything else that can be added. Here, we mainly consider $a \in \mathbb{R}$.
+
+
+The summation order of notation $\sum$ is determined by the arrangement of summands. There are several common summation methods that we will primarily focus on, including the repeated index sum (as depicted below), rectangular summation, and spherical summation.
+
+
+\begin{align}
+% d&=1 \qquad \qquad \sum_{i=-\infty}^{\infty} a(i) \label{d=1}\\
+d&=2 \qquad \qquad \sum_{i, j=-\infty}^{\infty} a(i, j) = \sum_{i=-\infty}^{\infty} \sum_{j=-\infty}^{\infty} a(i,j) \label{d=2}\\
+d&=3 \qquad \qquad \sum_{i, j, k=-\infty}^{\infty} a(i, j, k) = \sum_{i=-\infty}^{\infty} \sum_{j=-\infty}^{\infty} \sum_{k=-\infty}^{\infty} a(i, j, k) \label{d=3}
+\end{align}
+
+
+
+% 基础definitions，examples，thms
+% 还要写conditional_conv; abs_conv rearrange to anything thm;适当举例子
+\begin{definition}\label{def:conv_div}
+Given a sequence of values $\{F(\mathbf{l})\}_{\mathbf{l}}$, and a fixed summation method $\sum_{\mathbf{l}}$, we say that the series $\sum_{\mathbf{l}} F(\mathbf{l})$ \textbf{converges} if there exists a finite limit $S_d$ such that for any positive number $\epsilon$, there exists a positive integer $N$ such that for all integers $n \geq N$, the following inequality holds:
+\[
+\left| \sum_{\mathbf{l}} F(\mathbf{l}) - S_d \right| < \epsilon
+\]
+
+which is,
+\[
+\sum_{\mathbf{l}} F(\mathbf{l}) = S_d
+\]
+On the contrary, a series \textbf{diverges} if and only if it does not converge to any finite real number.
+\end{definition}
+
+
+\begin{definition}\label{def:abs_cond_convergence}
+We say the series $\sum_{\mathbf{l}} F(\mathbf{l})$ \textbf{absolutely converges} if the series obtained by taking the absolute values of the terms, $\sum_{\mathbf{l}} |F(\mathbf{l})|$ converges. The series \textbf{conditionally converges} if the series converges, but not converges absolutely.
+\end{definition}
+
+\begin{remark}
+The convergence of a series depends on the choice of summation method, while for absolutely convergent series, the choice of summation method is independent as a consequence of the Riemann rearrangement theorem below.
+\end{remark}
+
+
+\begin{theorem}[Riemann rearrangement]\label{thm:rearrangement}
+Let the sequence $\left\{ F(\mathbf{l}) \right\}$ of real numbers be such that the series $\sum_{\mathbf{l}} F(\mathbf{l})$ is conditionally convergent. Then, for every $\xi \in \mathbb{R}$ (or $\xi=+\infty$ or $\xi=-\infty)$, there exists a permutation $\phi=\phi_{\xi}$ (a bijection $\phi: \mathbf{l} \to \mathbf{l}$) such that:
+$$
+S^\phi = \sum_{k=1}^{\infty} F(\phi(k)) = \xi
+$$
+\end{theorem}
+In conclusion, there is a dichotomy: a series sum is either independent of rearrangement (absolutely convergent); or the series can sum to every number (including $\pm \infty$), i.e. conditionally convergent. \cite{series-3}
+
+
+
+
+
+
+% 提出madelung constant formula及pf not abs conv
+The Madelung constant of sodium chloride ($\mathrm{NaCl}$) exemplifies a three-dimensional lattice sum. In an ionic solid the attraction between anions (negatively charged ions) and cations (positively charged ions) is due to their opposing charges. Lattice energy is required to break the anion-cation bonds in one mole of an ionic solid under standard conditions.
+% Using the concept known as the Madelung constant, we can describe ions in crystals as point charges allowing us to determine their respective electrostatic potentials.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{NaCl_pic.jpg}
+    \label{NaCl structure}
+    \caption{FCC structure of $\mathrm{NaCl}$ \cite{Naclpic}}
+\end{figure}
+% The Madelung constant enables the computation of the electric potential of a single ion in a crystal.
+
+
+The Madelung constant is used in determining the electrostatic potential of a single ion in a crystal by approximating the ions to point charges:
+\begin{equation*}
+V_i=\frac{e}{4 \pi \epsilon_0 r_0} \sum_j \frac{z r_0}{r_{i j}}=\frac{e}{4 \pi \epsilon_0 r_0} M_i
+\end{equation*}
+\noindent where $r_0$ is the nearest neighbour distance and $M_i$ is the (dimensionless) Madelung constant of the $i$th ion \cite{madelung1918}:
+
+\begin{equation*}
+\mathrm{M}_{\mathrm{i}}=\sum_{\mathrm{j}} \frac{\mathrm{z}_{\mathrm{j}}}{\mathrm{r}_{\mathrm{ij}} / \mathrm{r}_0}
+\end{equation*}
+
+$\mathrm{NaCl}$, being an ionic crystal, has two separate Madelung constants - one for Na and the other for $\mathrm{Cl}$. Due to the symmetry, their magnitude is identical, and they differ only in sign. The electrical charge of $\mathrm{Na}^+$ and $\mathrm{Cl}^-$ ions is assumed to be +1 and -1, respectively, with $z_{\mathrm{Na}}$ = 1 and $z_{\mathrm{Cl}}$ = -1. The nearest neighbour distance is half the lattice constant of the cubic unit cell. If the ion is sitting at the point $(i, j, k)$ of the lattice, the Madelung constants will then be changed to another form:
+
+\begin{equation}\label{eq:Madelung_constant}
+M_{\mathrm{Na}}=-M_{\mathrm{Cl}}=\sideset{}{'}\sum_{(i, j, k) \in \mathbb{Z}^3} \frac{(-1)^{i+j+k}}{\left(i^2+j^2+k^2\right)^{1 / 2}}
+\end{equation}
+where the prime indicates that the term $(0,0,0)$ is excluded.
+
+The series is clearly not absolutely convergent (just take the line $i = j = k$ to get infinite harmonic sum, proof below), so the summation method is important (by Theorem \ref{thm:rearrangement}). It is even possible to use some divergent extended summation methods such as Hölder, Cesàro, Riesz, Abel, Euler, etc. \cite{hardy}
+
+
+\begin{proof}
+    By the definition of absolutely convergent series, we can apply a series contraction by considering only the line $i = j = k$ in the below expression:
+    \begin{align*}
+    \sideset{}{'}\sum_{(i, j, k) \in \mathbb{Z}^3} \left|\frac{(-1)^{i+j+k}}{\left(i^2+j^2+k^2\right)^{1 / 2}}\right| &= \sideset{}{'}\sum_{(i, j, k) \in \mathbb{Z}^3} \frac{1}{\left(i^2+j^2+k^2\right)^{1 / 2}} \\
+    &\geq \sum_{i \in \mathbb{Z} \backslash\{0\}} \frac{1}{\left(3 i^2\right)^{1 / 2}} \\
+    &= \frac{1}{\sqrt{3}} \sum_{i \in \mathbb{Z} \backslash\{0\}} \frac{1}{i} &&\qedhere
+    \end{align*}
+    where the infinite harmonic series $\sum_{n=-\infty}^{\infty}\frac{1}{n}$, which is divergent. Hence, series \ref{eq:Madelung_constant} is not absolutely convergent.
+\end{proof}
+
+
+\section{Preliminaries}
+For some divergent series, certain summation methods can be used to impose a limit, such as Hölder, Cesàro, and Riesz summation.
+\begin{example}\label{eg:Grandi's_series}
+\textbf{Grandi's series}, defined as
+$$
+S=\sum_{n=0}^{\infty} a_n=1-1+1-1+1-\cdots
+$$
+\textbf{diverges}. 
+\\Intuitively,
+$$
+S = (1-1)+(1-1)+(1-1)+\ldots=0+0+0+\ldots=0
+$$
+However, applying a similar bracketing trick yields a conflicting outcome.
+$$
+S = 1+(-1+1)+(-1+1)+(-1+1)+\ldots=1+0+0+0+\ldots=1
+$$
+By manipulating parentheses in Grandi's series, one can obtain either 0 or 1 as a "value". (Variations of this idea, known as the Eilenberg-Mazur swindle.)
+
+Another method, using the same algebraic methods that evaluate convergent geometric sequences: 
+$$S = 1-1+1-1+\ldots = 1-(1-1+1-1+\ldots) = 1-S$$  
+$$\Rightarrow S = \frac{1}{2}$$
+
+The above manipulations disregard the true significance of the sum of a series and the application of algebraic methods to divergent geometric series. All ‘natural’ calculations with this series seem to conclude that the divergent series sum should be $\frac{1}{2}$. Actually, from Definition \ref{def:cesaro_sum} we know that the Cesàro sum of Grandi's series is indeed $\frac{1}{2}$, see proof below.
+
+\end{example}
+
+
+We introduce a special summation method called Cesàro summation to assign a value to certain divergent series such as \ref{eg:Grandi's_series} by averaging its partial sums, which makes the Grandi's series Cesàro summable to $\frac{1}{2}$.
+
+The $(C, 1)$ definition below \ref{def:cesaro_sum} was applied originally to periodic oscillating series by D. Bernoulli in 1771, i.e. series with $a_{n+p} = a_n$ for a fixed p, and $a_1 + a_2 + ... + a_{p-1} = 0$. Then, it was used in the Grandi's series by Leibniz as early as 1713. Both Leibniz and Bernoulli did not devote significant attention to providing a formal definition in their work. The explicit usage of the concept can be traced back to Frobenius and Hölder in 1880 and 1882 respectively, but a formal definition did not emerge until 1890 when Cesàro published a paper on series multiplication. In this influential work, Cesàro not only formulated "a theory of divergent series" in general for all non-negative integer order but also established a significant theorem below (\ref{thm:regularity_cesaro}). \cite{hardy}
+
+
+\begin{definition}\label{def:cesaro_sum}
+A series $\sum_{n=0}^{\infty} a_n$ is said to be \textbf{Cesàro summable} with Cesàro sum $A \in \mathbb{R}$ if the arithmetic mean of its first n partial sums $s_0, s_1, s_2, ..., s_n$ tends to A:
+\[
+\lim_{n \rightarrow \infty} \frac{1}{n+1}\sum_{k=0}^{n}s_k = A,
+\]
+where, $s_k$ denotes the $k$th partial sum of the series,
+\[
+s_k = \sum_{n=0}^k a_n
+\]
+$A$ is called the Cesàro(or $(C, 1)$ as 1st order of Cesàro summation is used here) sum of $\sum a_n$, also Cesàro limit of $s_n$.
+\end{definition}
+\noindent In general, Cesàro summation $(C, k)$ of order $k$, we may discuss later.
+
+\begin{theorem}[Cauchy's limit theorem]\label{thm:regularity_cesaro}
+Cesàro's summation method sums every convergent series to its ordinary sum. $(C, 1)$ is a \textbf{regular} summation method.
+\end{theorem}
+
+This regularity demonstrates that Cesàro summation extends the concept of convergence. Even if a series does not converge in the traditional sense, Cesàro summation can assign a meaningful limit to it. For example, Grandi's series in \ref{eg:Grandi's_series}:
+\[
+s_n =
+\begin{cases}
+1 &\text{n is even}\\
+0 &\text{n is odd}
+\end{cases}
+\]
+\[
+s_0 + s_1 + ... + s_n =
+\begin{cases}
+\frac{n+2}{2} &\text{n is even}\\
+\frac{n+1}{2} &\text{n is odd}
+\end{cases}
+\]
+then $c_n = \frac{s_0 + s_1 + ... + s_n}{n+1} \to \frac{1}{2} \text{ as n} \to \infty$ for all n, no matter even or odd.
+
+However, it's important to note that not all divergent series have Cesàro sums, the series below is an example.
+
+\begin{example}
+A divergent but not Cesàro summable series,
+\[
+S = 1 - 2 + 3 -4 + 5 - 6 + ... = \sum_{n=1}^\infty n(-1)^{n-1}
+\]
+It diverges as the terms do not converge to 0 by the term test. For $n \geq 1$, partial sums $s_n$ are $1, -1, 2, -2, 3, -3, ...$ and arithmetic means of these partial sums are $1, 0, \frac{2}{3}, 0, \frac{3}{5}, 0, \frac{4}{7}, ...$ which diverges as it has a divergent sub-sequence consisting of only odd terms. So, the series is not $(C, 1)$ summable.
+\end{example}
+
+
+
+
+\section{Convergence of summation by rectangles}
+We will first discuss summation by expanding rectangles. It is a nice result that in many cases expanding by rectangles is convergent, an implication of which is that sums can be calculated easily, such as finding the Madelung constant as it is known that when by expanding by cubes the lattice sum to calculate it will converge.
+
+
+\subsection{Summation by expanding cubes}
+We will start by considering a sum over a two-dimensional lattice as a necessary preliminary for the 3D sum, and to gain an understanding of the proof. First, consider the two dimensional sum $$S_{2}(n) = \sideset{}{'}\sum_{-n \leq i,j \leq n} \frac{(-1)^{i+j}}{(j^{2} + i^{2})^{\frac{1}{2}}}$$
+
+Then $\lim{n \rightarrow \infty} $ will be the sum of this series by expanding squares over the whole plane.
+As this is an intuitive approach to the problem, we will give a sketch of the proof. First, we will split up the sum:
+$$S_{2}(n) = 4Q(n) + 4X(n)$$
+$$Q(n) := \sum_{i,j=1}^{n}\frac{(-1)^{i+j}}{(j^{2} + i^{2})^{\frac{1}{2}}}$$
+$$X(n) := \sum_{j = 1}^{n} \frac{(-1)^{j}}{j}$$
+This expresses that the sum over the plane is equal to the sum along all 4 half axes, and the sum in all 4 quadrants of the plane. Now if all of these elements are shown to converge to some real number, then the limit of S will also exist. It is known that $\lim{n\rightarrow\infty}X(n)$ exists and is equal to -ln(2) by Taylor series \cite{bigbook}. So convergence of $Q(n)$ is all that is needed to show convergence of the original sum. This convergence will follow from the following properties that are formally proven in \cite{bigbook}:
+
+\begin{property}
+    $$Q(2n) - Q(2n-2) > 0 \ \  for \ all \ n \geq 2$$
+\end{property}
+In other words, the even indexed elements increase. First, we consider the sum over a unit square and note that it is always larger than zero for $i + j$ even, and less than zero for the odd case \cite{bigbook}. Since we are considering even terms, the difference between successive terms will be an exact sum of evenly indexed unit squares,  and thus positive.
+
+\begin{property}
+    $$Q(2n+1) - Q(2n-1) < 0 \ \ for \ all \ n\geq 1$$
+\end{property}
+This follows similarly to the above property, but now the difference between the two is a series of squares with a negative sum over them. There is also some overlap in these squares as each square has two lattice points per edge and we are summing over odd terms however the repeated points' sum is positive and thus the overall difference is still negative.
+
+
+
+
+\begin{property}
+ $$Q(2n+1) - Q(2n) > 0 \ \ for \ all \ n \geq 1$$
+\end{property}
+With this we can argue by contradiction that all odd indexed terms are greater than all even indexed terms using this and properties 3.1 and 3.2. The property itself can be proven by considering the difference between terms. \cite{bigbook}$$Q(2n+1) - Q(2n) = 2 \sum_{l=1}^{n} \left[ \frac{1}{((2l-1)^{2} + (2n +1)^{2})^{\frac{1}{2}}} - \frac{1}{((2l)^{2} + (2n +1)^{2})^{\frac{1}{2}}} \right] + \frac{1}{(2n+1)\sqrt{2}} > 0$$\\
+\begin{figure}[h]
+\centering
+\begin{minipage}{0.4\textwidth}
+\includegraphics[width=\textwidth]{ions.2.png} 
+\captionsetup{width=\textwidth}
+\caption{A figure demonstrating property 3.1}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \includegraphics[width=\textwidth]{ions_.png} 
+\captionsetup{width=\textwidth}
+\caption{A figure demonstrating property 3.2}
+\end{minipage}
+
+\end{figure}
+\begin{property}
+    $$ \lim_{n \rightarrow \infty} Q(2n+1) - Q(2n) = 0$$
+\end{property}
+So consecutive terms will have an insignificant difference for large enough n. This comes from Property 3.3 and by bounding the value of the differences \cite{bigbook} as $$Q(2n+1) - Q(2n) < \frac{2}{(1+(2n+1)^{2})^{\frac{1}{2}}} + \frac{1}{(2n+1)\sqrt{2}} \rightarrow 0$$ as $n \rightarrow \infty$. This proves the claim. \\
+
+Now we claim that these properties imply that $Q(n)$ has a finite limit. Property 3.3 and 3.2 gives that the sum is bounded by the first oddly indexed element, and since successive terms go to 0 then in the limit it will not alternate between values, it will have a unique limit. As a result we have that $\lim_{n \rightarrow \infty} Q(n)$ exists.
+
+Having now gone over the idea of the proof of convergence of $Q(n)$ we can move on to three dimensions. The proof follows the same method, however now we consider the sum $$ S_{3}(n) = \sideset{}{'}\sum_{{-n \leq i,j,k \leq n}} \frac{(-1)^{i+j+k}}{(j^{2} + i^{2} + k^{2})^{\frac{1}{2}}}
+$$
+In order to prove this limit exists we again split up the sum $$S_{3}(n) = 8P(n) +12Q(n) + 6X(n)$$
+Where $Q(n)$ and $X(n)$ are defined above and 
+$$P(n) = \sum_{i,j,k = 1}^{n} \frac{(-1)^{i+j+k}}{(j^{2} + i^{2} + k^{2})^{\frac{1}{2}}}$$
+This results in us summing each half-axis, octant, and plane between the octants separately.\\
+First we note that the sum over a unit cube in $P(n)$ is positive if the closest corner to the origin's coordinate sum is even and negative if it's odd \cite{bigbook} 
+
+\begin{property}
+$$P(2n) - P(2n-2) < 0 \ \ for \ all \ n \geq 2 $$
+\end{property}
+
+This follows from the difference between two successive even terms being equal to an exact sum of cubes all with odd base index similarly to the 2D case, hence the difference is negative.
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.1]{3dlattice.png} 
+\captionsetup{width=0.6\textwidth}
+\caption{A figure demonstrating the difference between successive terms grouped into unit cubes}
+\end{figure}
+
+
+
+\begin{property}
+$$P(2n+1) - P(2n-1) > 0 \ \ for \ all \ n \geq 2 $$
+\end{property}
+This follows similarly to property one, however since it is an odd term the difference will not be a perfect sum of cubes, there is more to consider. In fact we will sum cubes over all of the sides between the two terms, and then sum the edges where these sides meet. After correcting for over-counting points multiple times, the result still holds \cite{bigbook}.
+
+\begin{property}
+$$P(2n+1) - P(2n) < 0 \ \ for \ all \ n \geq 1 $$
+\end{property}
+Similarly to the 2D case, this then implies that the even indexed elements are all greater than the odd indexed elements. The property itself is a direct consequence of the fact that the difference between these terms is three squares on the outside of the cubes, three edges to join them and one corner point. All of the sums across these are strictly negative, hence the result follows.
+
+\begin{property}
+$$\lim_{n \rightarrow \infty} P(2n + 1) - P(2n) = 0$$
+\end{property} This comes by bounding the difference below by a value which itself tends to zero. Now paired with property 3.7, we see that the limit must be less than zero, but also will be greater than some sequence that tends to zero. As a result, the limit must be 0 \cite{bigbook}:
+
+Having now acquired these 4 properties, it is plain that $P(n)$ must converge to a sum in a similar way to $Q(n)$: The sequences of even and odd partial sums are both monotone and bounded, and will converge to the same thing as the difference between terms goes to zero. Thus the series converges. For a visual representation, this convergence of partial sums will converge in much the same way as in Figure 3.5. Now that this has been established, we have the convergence of everything composing the sum $S_{3}(n)$. \\ 
+
+This approach proves the convergence of the sum for the Madelung constant when summed over expanding cubes, and is thus a useful tool, especially since the approach used is quite intuitive. However we have in fact stronger statements, which we will consider in greater detail: It has been proved that summation over rectangles is equivalent to an absolutely convergent sum. What's more this absolutely convergent sum has some free variables, leading to calculations for more sums in the form $$\sum_{(i,j,k) \in \mathbb{Z}^{3}} \frac{(-1)^{i+j+k}}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}$$
+
+\subsection{Summation by expanding rectangles}
+We will first define some basic notation:
+\newline Let $\Pi_{I,J,K} := \, [-I,I] \, \times \, [-J,J] \, \times \, [-K,K]$, \qquad $Q_{i,j,k} := \, [I, I+1] \, \times \, [J, J+1] \, \times \, [K, K+1] \  I,J,K \in \mathbb{N}$
+\[S_{\Pi_{I,J,K}}(a,s) := \sum_{(i,j,k) \in \Pi_{I,J,K} \cap \mathbb{Z}^3}^{} \frac{(-1)^{i+j+k}}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}\]
+It is also important that in the above sum and all the following sums the term $(i,j,k) = 0$ will not be included.
+Now we will consider the sum:
+\begin{equation}
+    M_{a, s} := \sum_{(i,j,k) \in \mathbb{Z}^{3}} \frac{(-1)^{i+j+k}}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}
+\end{equation} 
+
+As a note we can see that this will be equal to the Madelung constant for $s = \frac{1}{2}, a = 0$, however the proof will be more general.\\
+
+We say that this is summable by expanding rectangles if 
+\[
+M_{a, s} = \lim_{(I, J, K) \rightarrow \infty}\,S_{\Pi_{I,J,K}}(a,s) \] converges to a finite value.
+\newline We start to show this by first bounding the sum over a unit cube.
+\begin{equation}
+    E_{I,J,K}(a,s) := \sum_{i = 2I}^{2I+1} \sum_{j = 2J}^{2J+1} \sum_{k = 2K}^{2K+1}\frac{(-1)^{i+j+k}}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}
+\end{equation}
+
+This sum can be bounded as follows \cite{thepaper}:
+\begin{equation}
+     \lvert E_{I,J,K}(a,s) \rvert \leq C(a^{2} + I^{2} + J^{2} + K^{2})^{-s-\frac{3}{2}}
+\end{equation}
+\begin{proof}
+    let $f(i,j,k) := \frac{1}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}$ Then it can be seen with simple differentiation and integration that $$E_{I,J,K}(a,s) = -\int_{0}^{1}\int_{0}^{1}\int_{0}^{1}\partial_{i}\partial_{j}\partial_{k}f(2I+s_{1},2J+s_{2} ,2k+s_{3})$$
+It then follows by bounding the integral by the functions' minimum and maximum values that 
+$$E_{I,J,K}(a,s) \leq max \{ -\partial_{i}\partial_{j}\partial_{k} f(i,j,k) \}$$
+$$E_{I,J,K}(a,s) \geq min \{ -\partial_{i}\partial_{j}\partial_{k} f(i,j,k) \} \, \qquad \text{for} \, (i,j,k) \in Q_{2I,2J,2K}$$
+
+This bound can in fact be calculated to be 
+$$\partial_{i}\partial_{j}\partial_{k} f(i,j,k) = 8s(s-1)(s-2)ijk\frac{1}{(a^{2} + i^{2} + j^{2} + k^{2})^{s-3}}$$
+Now by bounding each variable $i,j,k$ as $$i,j,k \leq (a^{2} + i^{2} + j^{2} + k^{2})^{\frac{1}{2}} $$
+The result then follows.
+\end{proof} 
+
+
+Now we need a preliminary lemma from \cite{thepaper} in order to bound the absolute version of the sum $M_{a,s}$:
+
+\begin{lemma} 
+Let the continuous function $f:\mathbb{R} \setminus \{ 0 \}\rightarrow \mathbb{R}_{+}$ be such that
+\begin{equation}
+C_{2} max f(x) \leq min f(x) \leq C_{1} max f(x)
+\end{equation}
+(i,j,k) $\in \mathbb{Z}^{3}$ and the constants $C_{1}$ and $C_{2}$ are positive and are independent of $Q_{i,j,k}$ with zero not in the cube. Let $\Omega \subset \mathbb{R}^{3}$ be a domain without zero and
+\begin{equation}
+     \Omega_{lat} := \{(i,j,k) \in \mathbb{Z}^3 : \exists Q_{i,j,k} \in \Omega, \quad (i,j,k) \in Q_{i,j,k} \}
+\end{equation}
+
+Then,
+$$\sum_{(i,j,k) \in \Omega_{lat}} f(i,j,k) \leq C \int_{\Omega} f(x) dx$$
+with $C$ independent of $\Omega$ and $f$.
+\end{lemma}
+\begin{proof}
+    Property (3.4) gives that $$C_{2} \int_{Q_{I,J,K}} f(x) dx \leq f(i,j,k) \leq C_{3} \int_{Q_{I,J,K}} f(x) dx$$
+The left inequality comes from bounding the integral above by $\min f(x)$, and the right inequality follows by choosing a sufficiently large $C_{3}$ to ensure the integral is larger than just integrating over the maximum value of the function, for example $\frac{1}{C_{2}}$. We know such a constant exists from (3.4). As a result this will hold for all $(i,j,k)$.
+\newline Now any point (i,j,k) can only belong to at most 8 cubes, taking a place as a different vertex each time, and so if we take $C$ to be $8C_{3}$ the proof follows: We integrate over the lattice 8 times to consider every case, thus ensuring the bound holds.
+\end{proof}
+
+Now the function $f(i,j,k) := \frac{1}{(a^{2} + x^{2})^{s}}, \quad x^{2} = i^{2} + j^{2} + k^{2} $ satisfies the properties above, and hence we can use this lemma to bound our sum. \cite{thepaper}
+\begin{equation}
+\begin{split}
+\sum_{(i,j,k) \in B_{n}\mathbb{Z}^3}^{} (a^{2} + i^{2} + j^{2} + k^{2})^{-s} & \leq C_{s} \int_{x \in B_{n} \setminus B_{1}} (a^{2} + x^{2})^{-s} \\ & \leq 4\pi C_{s} \int_{1}^{\sqrt{n}} R (a^{2} + R^{2})^{-s - \frac{1}{2}} dR \\ & = \frac{4 \pi C_{s}}{2s + 3} \left( (a^{2} + n)^{-s + \frac{3}{2}} - (a^{2} + 1)^{-s + \frac{3}{2}} \right) \\ & = \frac{4 \pi C_{s}}{2s + 3} \left( \frac{1}{(a^{2} + n)^{s - \frac{3}{2}}} - \frac{1}{(a^{2} + 1)^{s - \frac{3}{2}}} \right)
+\end{split}
+\end{equation}
+Where $B_{n} := \{ x \in \mathbb{R}^{3} : \lvert x \rvert ^{2} \leq n \}$ and the sum, as usual, does not contain the origin. This follows at first by bounding the result with the lemma above. The next inequality follows by considering the integral over the radius of the spheres we are expanding by. Even though we are expanding by spheres for this sum, because we are taking the limit over the whole space we arrive at a bound for the standard sum with all methods of summation. Now if $s \ge \frac{3}{2}$ then when we take $ \lim{n \rightarrow \infty}$ we see that 
+\begin{equation}
+\sum_{(i,j,k) \in \mathbb{Z}^3} \frac{1}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}} \leq \frac{C_{s}}{(a^{2} + 1)^{s - \frac{3}{2}}}
+\end{equation}
+
+
+This is obviously convergent for $s>\frac{3}{2}$, otherwise the limit of the upper bound would go to infinity as can be seen in the final line of (3.6). Of course, in calculating the Madelung constant this will not help as we need such a bound for $s = \frac{1}{2} $ and so further proofs are needed. We now aim to prove one final inequality that will allow us to in fact prove convergence for all $s>0$.\\
+
+First define $$  E_{\Pi_{I,J,K}}(a,s) := \sum_{(i,j,k) \in \Pi_{I,J,K}\cap\mathbb{Z}^{3}}E_{i,j,k}(a,s)$$ This is equivalent to summing over the unit cubes within a rectangle.
+Let $0 \le s \leq \frac{3}{2}$ Then
+
+\begin{equation}
+    \lvert S_{\Pi_{I,J,K}}(a,s) - E_{\Pi_{I,J,K}}(a,s) \rvert \leq \frac{C_{s}}{(a^{2} + min\{ I^{2},J^{2},K^{2})^{s}}
+\end{equation}
+with $C_{s}$ independent of $a,I,J,K$.\cite{thepaper}\\
+The implications of this property given that they sum over the whole 3D lattice, the sums $S_{\Pi}$ and $E_{\Pi}$ are equivalent:
+
+\begin{equation}
+\begin{split}
+    M_{a,s} & = \lim_{(I, J, K) \rightarrow \infty}\,S_{\Pi_{I,J,K}}(a,s) \\ & = \lim_{(I, J, K) \rightarrow \infty} E_{\Pi_{I,J,K}}(a,s) \\ & = \lim_{(I, J, K) \rightarrow \infty} \sum_{(i,j,k) \in \Pi_{I,J,K} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s) 
+\end{split}
+\end{equation}
+
+\begin{proof}
+    To prove (3.8) we compute the difference between the two sums on a case-by-case basis. We will discuss the idea behind the inequality before looking at an explicit case:\\
+
+    The difference between the two sums will be a sum of 2D rectangles of points, as otherwise you would be able to fit another layer of cubes in the sum and thus they would be equivalent. And so we have a sum of two-dimensional lattice sums as the difference. Of course we can apply a version of the bounds (3.3), (3.7), and (3.8) to the two-dimensional case using the same method as in the 3D to bound each of these lattice sums. Proceeding by induction on the dimension of the sum we assume the original inequality to be true for the 2D case, and then we use this to bound the difference of the 3D case due to its reduction into 2D sums. Finally as in the one-dimensional case the estimate follows immediately, we see that this inequality is in fact true for the 3D case by induction. \\
+    First note that due to (3.3) and (3.7)
+    \begin{equation}
+    \begin{split}
+        \vert E_{\Pi_{I,J,K}}(a,s) \vert &\leq \sum_{(i,j,k) \in \Pi_{I,J,K}\cap\mathbb{Z}^{3}} \left\vert E_{i,j,k}(a,s)\right\vert \\ &\leq \sum_{(i,j,k) \in \Pi_{I,J,K}\cap\mathbb{Z}^{3}} C(a^{2} + I^{2} + J^{2} + K^{2})^{-s-\frac{3}{2}}\\ &\leq
+        \frac{C_{s}}{(a^{2} + 1)^{s}}
+    \end{split}
+    \end{equation}
+    We now look at the example case of the difference between the sums with an even side length of the rectangle, discussed in \cite{thepaper}:
+    $$
+\begin{aligned}
+ S_{\Pi_{2 I, 2 J, 2 K}}(a, s)-E_{\Pi_{2 I, 2 J, 2 K}}(a, s) & =\sum_{\substack{-2 J \leq j \leq-2 J \\
+-2 K \leq k \leq 2 K}}(-1)^{j+k} f(2 I, j, k) \\
+& +\sum_{\substack{-2 I \leq i \leq-2 I \\
+-2 K \leq k \leq 2 K}}(-1)^{i+k} f(i, 2 J, k) \ +\sum_{\substack{-2 I \leq i \leq-2 I \\
+-2 J \leq j \leq 2 J}}(-1)^{i+j} f(i, j, 2 K) \\
+& -\sum_{-2 I \leq i \leq-2 I}(-1)^{i} f(i, 2 J, 2 K)-\sum_{-2 J \leq j \leq-2 J}(-1)^{j} f(2 I, j, 2 K) \\
+& -\sum_{-2 K \leq k \leq-2 K}(-1)^{k} f(2 I, 2 J, k)+f(2 I, 2 J, 2 K) .
+\end{aligned}
+$$
+Each of the sums in the above equation represents the points on one side of the boundary of the rectangle, and thus is equivalent to a 2D lattice sum. To see this mathematically, note that $f(2I,j,k) = g(j,k)$ where $g := \frac{1}{(a_{g}^{2} + i^{2} + j^{2})^{s}}$. In this case $a_{g} = \sqrt{a^{2} + 4I^{2}}$
+
+
+Now because they are 2D analogues, we proceed by induction and bound them as seen in \cite{thepaper}:
+$$
+\begin{aligned}
+\left|S_{\Pi_{2 I, 2 J, 2 K}}(a, s)-E_{\Pi_{2 I, 2 J, 2 K}}(a, s)\right| &\leq \frac{C_{s}}{\left(a^{2}+4 I^{2}+1\right)^{s}}+\frac{C_{s}}{\left(a^{2}+\min \left\{J^{2}, K^{2}\right\}\right)^{s}}+\frac{C_{s}}{\left(a^{2}+4 J^{2}+1\right)^{s}} \\
+&+ \frac{C_{s}}{\left(a^{2}+\min \left\{I^{2}, K^{2}\right\}\right)^{s}}+\frac{C_{s}}{\left(a^{2}+4 K^{2}+1\right)^{s}}+\frac{C_{s}}{\left(a^{2}+\min \left\{I^{2}, J^{2}\right\}\right)^{s}} \\
+&+\frac{C_{s}}{\left.\left(a^{2}+4 I^{2}+4 K^{2}\right\}\right)^{s}}+\frac{C_{s}}{\left.\left(a^{2}+4 I^{2}+4 J^{2}\right\}\right)^{s}}+\frac{C_{s}}{\left.\left(a^{2}+4 J^{2}+4 K^{2}\right\}\right)^{s}} \\
+&+\frac{C_{s}^{\prime}}{\left.\left(a^{2}+4 I^{2}+4 J^{2}+4 K^{2}\right\}\right)^{s}} \\&\leq \frac{C^{2}}{\left(a^{2}+\min \left\{I^{2}, J^{2}, K^{2}\right\}\right)^{s}} .
+\end{aligned}
+$$
+\end{proof}
+In the above we have bounded each 
+\begin{align*}
+    \left\vert S_{\Pi_{I,J}} \right\vert &\leq \left\vert E_{\Pi_{I,J}} \right\vert + \frac{C_{s}}{(a^{2} + min\{ I^{2},J^{2})^{s}}\\ &\leq \frac{C_{s}}{(a^{2} + min\{ I^{2},J^{2})^{s}} + \frac{C_{s}}{(a_{g}^{2} + 1)^{s}} \\ &\leq \frac{C_{s}^{\prime}}{(a^{2} + min\{ I^{2},J^{2})^{s}}
+\end{align*}
+
+
+
+
+
+
+
+
+This shows that in the limit as we sum over the whole of $\mathbb{Z}^{3}$ we can consider the following
+
+\begin{equation}
+    \begin{split}
+     &\lim_{(I, J, K) \rightarrow \infty} \sum_{(i,j,k) \in \Pi_{I,J,K} \cap \mathbb{Z}^{3}} \left\vert E_{i,j,k}(a,s) \right\vert
+       \\  &\leq \lim_{(I, J, K) \rightarrow \infty} \sum_{(i,j,k) \in \Pi_{I,J,K} \cap \mathbb{Z}^{3}} \frac{C}{(a^{2} + I^{2} + J^{2} + K^{2})^{s+\frac{3}{2}}} \\ & \leq \frac{C_{s}}{(a^{2} + 1)^{s}}
+    \end{split}
+\end{equation}
+The first inequality follows from (3.3) and the second follows from (3.7)
+Since this sequence of partial sums is bounded and monotone increasing it is convergent, and hence we have that the sum is absolutely convergent. In fact the Madelung constant is equal to this absolutely convergent sum, allowing one to calculate the Madelung constant by summation over any expansion of rectangles instead of just cubes in the sum in (3.9). It also allows us to consider the convergence of other lattice sums of a similar form, thus making it a stronger proof.\\
+
+In particular one can consider Fourier series in the form $$f(x) = \sum a_{n_{1}n_{2}...n_{k}}e^{i(n_{1}x_{1} + n_{2}x_{2} + ... + n_{k}x_{k})}$$
+Evaluating these at the point $x = (\pi,\pi,...,\pi)$ and through choosing sufficient values of $a_n$ , we can rewrite values of particular Fourier series in the form of $$\sum_{(i,j,k) \in \mathbb{Z}^{3}} \frac{(-1)^{i+j+k}}{(a^{2} + i^{2} + j^{2} + k^{2})^{s}}$$ This is useful for calculating specific values and seeing whether or not they will converge to a point. \cite{stein}
+
+\subsection{Numeric estimate of the rate of convergence of summation by expanding cubes}
+%square graph
+We would like to graphically illustrate the convergence behavior of summation by expanding cubes for both two-dimensional and three-dimensional cases. The below figures were plotted uing Python, specifically with the numpy library for the numeric computation and matplotlib library for plotting the sequence.
+
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{2d_square_partial_sum.png} 
+\captionsetup{width=0.5\textwidth}
+\caption{{A figure plotting $S_2(N)$, $N$th partial sums of two-dimensional lattice sum by expanding cube against $ N $ up to $\mathrm{N}=100000$.}}
+\end{figure}
+
+Some numeric simulations for $S_2(N)$, the Nth partial sum for the two-dimensional cases, are presented in the figure above. We see that $S_2(n)$ monotonically decreases and converges to the Madelung constant.
+
+
+
+%3d_square_partial_sum
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{3d_square_partial_sum.png}  
+\captionsetup{width=0.6\textwidth}
+\caption{A figure plotting $S_3(N)$, $N$th partial sums of three-dimensional lattice sum by expanding square against $ N $ up to $\mathrm{N}=4000$.}
+\end{figure}
+
+In the three-dimensional case, the odd-indexed subsequence of $S_3(n)$ monotonically decreases, while the even-indexed subsequence monotonically increases. Both subsequences converge to the same limit - the Madelung constant. 
+% formal
+
+To further analyze the rate of convergence, we employ a log-log scale for the subsequent scatter plots. This decision is motivated by the involvement of different orders of magnitude, making the convergence pattern in previous figures less apparent as N becomes large.
+
+To measure the accuracy of an approximation of convergent sequence by its terms, we introduce the concept of log errors. 
+
+Definition: Given a convergent sequence $\left(a_n\right)_{n \in N}$ with $\lim _{n \rightarrow \infty} a_n=a$ and $a_n \neq a$ for all $n$, the log errors of $a_n$, denoted $l a_n$, is defined as 
+$$
+l a_n=\log _{10}\left|a_n-a\right|
+$$
+
+The following figures display the log errors of $S_2(N)$ and $S_3(N)$ against $\log_{10} N$ respectively.
+
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{0.48\textwidth}
+\includegraphics[width=\textwidth]{2d_square_log.png} 
+\captionsetup{width=\textwidth}
+\caption{A figure plotting log errors of $N$th partial sums of two-dimensional lattice sum by expanding square against $ \log _{10} N $ up to $\mathrm{N}=30000$.}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{3d_square_log_res.png} 
+\captionsetup{width=\textwidth}
+\caption{A figure plotting log errors of $N$th partial sums of three-dimensional lattice sum by expanding square against $ \log _{10} N $ up to $\mathrm{N}=4000$.}
+\end{minipage}
+
+\end{figure}
+
+
+It can be observed that the log errors in both cases are upper-bounded by a linear function of $\log_{10} N$ with negative gradients, i.e. there exists constants $c$ and $k$, with $c<0$, such that $l\left(a_N\right) \leq c \log _{10} N+k$ for any $ N \in \mathbb{N}_1 $.
+% check formalty
+
+To construct a characteristic linear function, i.e. this linear function should effectively encapsulate the decay rate of the error. We use the method of linear regression to determine its gradient. This approach fits a straight line to the distribution of our data points with the sum of the squared residuals minimized, thus offering a reasonable approximation for the underlying trend in our sequence. 
+
+In the linear regression analysis, considering the inherent data density escalation with increasing values of log(n) in our logarithmic scale, we implement a weighting scheme where weights are inversely proportional to n. This counteracts the disproportionate influence of data points clustered at higher log(n) values and ensures a more balanced contribution from all observations in our linear regression model fitting process. 
+
+In a weighted simple linear regression, given a set of points $\left(x_i, y_i\right)$ with weights $w_i$
+, we manage to find the gradient $\beta_1$ and the intercept $\beta_0$ such that the weighted sum of squared residuals, $$\sum w_i\left(y_i-\left(\beta_1x+\beta_0\right)\right)^2$$
+ is minimised. 
+ 
+ To accomplish this, we set the derivatives of the weighted sum of squared residuals with respect to $\beta_1$ and $\beta_0$ as zero and obtain the following equations.
+
+$$
+\left\{\begin{array}{l}
+\sum w_i\left(y_i-\left(\beta_0+\beta_1 x_i\right)\right)=0   \\
+\sum w_i x_i\left(y_i-\left(\beta_0+\beta_1 x_i\right)\right)=0   
+\end{array}\right.
+$$
+
+Expanding these gives:
+
+\begin{align*}
+\sum w_i y_i - \sum w_i \beta_0 - \sum w_i \beta_1 x_i &= 0 \\
+\sum w_i x_i y_i - \sum w_i x_i \beta_0 - \sum w_i x_i \beta_1 x_i &= 0
+\end{align*}
+
+
+We denote the weighted mean of x as $\bar{x} = \frac{\sum w_i x_i}{\sum w_i}$. The first equation then becomes:
+
+\begin{align*}
+\sum w_i y_i = \beta_0 \sum w_i + \beta_1 \bar{x} \sum w_i
+\end{align*}
+
+Solving for $\beta_0$ gives:
+
+\begin{align*}
+\beta_0 = \frac{\sum w_i y_i - \beta_1 \bar{x} \sum w_i}{\sum w_i}
+\end{align*}
+
+Substitute this result into the second equation to isolate $\beta_1$:
+
+\begin{align*}
+\sum w_i x_i y_i - \frac{\sum w_i y_i - \beta_1 \bar{x} \sum w_i}{\sum w_i} \sum w_i x_i - \beta_1 \sum w_i x_i^2 &= 0
+\end{align*}
+
+After rearranging, we get the formula for $\beta_1$, the gradient:
+
+\begin{align*}
+\beta_1 = \frac{\sum w_i x_i y_i - \bar{x} \sum w_i y_i}{\sum w_i x_i^2 - \bar{x}^2 \sum w_i}
+\end{align*}
+
+
+
+ After determining the gradient of the line, we adjust its y-intercept so that it passes through the "highest point", i.e., the point with the largest positive residual, to ensure our derived linear function actually acts as an upper bound, and aligns closely with the individual data points as well.
+
+Following these steps, the gradients we obtain are -0.9719 and -1.0035 for each case respectively. To demonstrate the relationship between the linear upper-bound of log errors and the decay rate of the absolute error, we introduce the following theorem:
+
+
+\begin{theorem}
+Given a convergent sequence $a_n$ with limit a,  if $l a_n \leq c \log_{10} N + k$, where $c < 0$ and $k$ are constants, then $|a_N - a| = O(N^c)$
+\end{theorem}
+
+\begin{proof}
+$$
+l a_N \leq c \log _{10} N+k
+$$
+$$
+10^{l a_N} \leq 10^{c \log_{10} N + k}
+$$
+$$
+\left|a_N-a\right| \leq N^c \cdot 10^k
+$$
+$$
+|a_N - a| = O(N^c)
+$$
+since $10^k$ is constant.
+\end{proof}
+
+Based on the results from linear regression and Theorem 3.10, we conjecture the following:
+
+\begin{conjecture}
+For the approximations of the Madelung constant using the Nth partial sum by expanding cube, in the two-dimensional (2D) case, the absolute error is $O(n^{-0.9719})$ and in the three-dimensional (3D) case, the absolute error is $O(n^{-1.0035})$. This indicates that the rate of convergence decreases as N increases.
+\end{conjecture}
+
+
+\section{Divergence of sphere summation}
+
+A more intuitive way of summing over a lattice would be considering a sphere of increasing radius. In the 2D case, much like summing using rectangles, this converges. See proof in \cite{bigbook}. The case in 3D is more interesting - many papers quote this method as the way of calculating the Madelung constant, when on further investigation we see that this sum diverges and is therefore not well defined.
+
+Let the set of lattice points for NaCl be :
+\[S = \left\{ \frac{(-1)^{i+j+k}}{(i^{2} + j^{2} + k^{2})^{\frac{1}{2}}} : (i,j,k)  \in \mathbb{Z}/ \{0\}\right\} \]
+
+Let $C(n)$ denote the number of ways of expressing n as a sum of three cubes, or equivalently the number of lattice points on the surface of a sphere radius $\sqrt{n}$.
+
+Then the sum of the set S becomes : 
+\begin{equation}\tag{$4.1$}
+    \sum_{n=1}^{\infty} \frac{(-1)^{n}C(n)}{\sqrt{n}}
+\end{equation}
+
+Let $C_{r}$ denote the number of points on or within the sphere radius $r$. Then, for $\sqrt{n} \leq r \leq \sqrt{n+1}$ :
+$$ C_{r} = \sum_{k=1}^{n}C(k)$$
+
+If we imagine the error between unit cubes formed from these points and the volume of the sphere in terms of r, we can bound this by two grids of depth 1, with $r\times r$ cubes. 
+
+\begin{align*}
+C_{r} - \frac{4}{3}\pi r^{3} \leq 2r^{2} 
+\end{align*}
+\begin{equation}\tag{$4.2$}
+    \Rightarrow \lim_{r \rightarrow \infty } \frac{C_{r}}{r^{3}} = \frac{4}{3}\pi
+\end{equation}
+\begin{proposition}
+$(4.1)$ diverges. 
+\end{proposition}
+
+\begin{proof}
+This follows the proof in \cite{bigbook}. We proceed by contradiction. Assume $(4.1)$ converges.
+
+Then we have:
+\begin{align*}\epsilon_{n} := \frac{C(n)}{\sqrt{n}} \rightarrow 0 \text{ as }n\to \infty \\
+\therefore M_{N} := max\{\epsilon_{n} : n \geq N\} \rightarrow 0 \text{ as } N \to \infty
+\end{align*}
+
+Now, for $n > N$:
+\begin{equation}\tag{$4.3$}
+    \frac{C_{\sqrt{n}}}{(\sqrt{n})^{3}} = n^{-\frac{3}{2}} \left[ \sum_{k=1}^{n} \epsilon_{k} \sqrt{k} \right]\leq n^{-\frac{3}{2}} \left[ \sum_{k=1}^{N} \epsilon_{k} \sqrt{k} \right] + M_{N}n^{-\frac{3}{2}} \left[ \sum_{k=N+1}^{n}\sqrt{k} \right]
+\end{equation}
+
+
+We can bound the second term by integration as follows:
+\begin{equation}\tag{$4.4$}
+    \sum_{k=N+1}^{n}\sqrt{k} \leq \int_{N+1}^{n+1}\sqrt{t}\ dt = \frac{2}{3}\left [(n+1)^{\frac{3}{2}}-(N+1)^{\frac{3}{2}} \right ]
+\end{equation}
+
+
+
+Combining $(4.3)$ and $(4.4)$ we get:
+
+$$\frac{C_{\sqrt{n}}}{(\sqrt{n})^{3}} \leq n^{-\frac{3}{2}} \left[ \sum_{k=1}^{N} \epsilon_{k} \sqrt{k} \right] + M_{N} \left[ \left(\frac{n+1}{n}\right)^{\frac{3}{2}}-\left(\frac{N+1}{n}\right)^{\frac{3}{2}} \right]
+$$
+$$\therefore \forall N \ \limsup_{n \to \infty} \frac{C_{\sqrt{n}}}{(\sqrt{n})^{3}} \leq \frac{2}{3} M_{N}
+$$
+$$\lim_{N \to \infty} M_{N} = 0\ \therefore\ \lim_{n \to \infty} \frac{C_{\sqrt{n}}}{(\sqrt{n})^{3}} = 0
+$$
+
+This contradicts $(4.2)$, therefore  $(4.1)$ diverges. 
+\end{proof}
+
+ 
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{3d_sphere_diverge.png}  
+\captionsetup{width=0.6\textwidth}
+\caption{{A figure plotting $N$th partial sums of $(4.1)$ against $ N $ up to $\mathrm{N}=100000$.}}
+\end{figure}
+
+Some numeric simulations of $N$th partial sums of $(4.1)$ against N are presented in Figure 4.1, which suggests divergence, underlining the necessity for alternative techniques for successful convergence by expanding spheres. Such methods are introduced in the following section.
+
+
+
+
+
+\section{Methods of Summation}
+In this section we will introduce three new methods of summation in order to derive a well-defined limit to the Madelung sum when taken over increasing spheres. 
+We will use the notation: $$A_{n} := \sum_{i=0}^{n}a_i$$
+
+\subsection{Hölder's Method}
+This is a generalization of \textbf{Cesàro summation}, which we will introduce next. We define $H_n^r$ iteratively: 
+\begin{align*}
+H^{0}_n = A_n \\
+H^{1}_n = \frac{A_0 + A_1 + \cdots +A_n}{n+1} \\
+H^{2}_n = \frac{H_{0}^1+ H_{1}^1 + \cdots +H_{n}^1}{n+1} \\ \vdots \\
+H^{r+1}_n = \frac{H_{0}^r+ H_{1}^r + \cdots +H_{n}^r}{n+1}
+\end{align*}
+
+If $\lim_{n \to \infty} H_{n}^r = A$ then we say $a_n$ is \textbf{Hölder-summable} and $\sum a_n = A \ (H,r)$. Note $(H,0)$ is equivalent to normal summation, and $(H,1)$ is equivalent to the mean of partial sums, or the \textbf{Cesàro Sum} (see below).
+
+\subsection{Cesàro's Method}
+\textbf{Cesàro summation} is the most common method for calculating limits of normally divergent series. The \textbf{Cesàro Sum} of a sequence, $C_{N} := \frac{A_N}{N}$ is defined as the mean of the partial sums. For example, the below series is divergent:
+\begin{equation}\tag{Grandi's Series}
+    \sum_{n=0}^\infty (-1)^n
+\end{equation}
+ 
+
+However, its Cesàro sum can be calculated (see Example $2.1$):
+$$\underset{n \to \infty}{lim}\ C_N= \frac{1}{2}$$
+
+Therefore we say the Cesàro sum of the series is $\frac{1}{2}$.  Many series are still divergent using this method, so we require something stronger. We define a further family of summation methods, $(C, k)$ summation for $k \geq 0$ (the case $\kappa = 0$ is equivalent to normal Cesàro summation).
+
+\begin{equation}
+    C_{n}^{k}(A):= \frac{A_{n}^k}{E_{n}^k} \to A \ (C,k)
+\end{equation}
+Where $A_n^k$ is defined iteratively:
+\begin{align*}
+A_{n}^0 = A_n \\
+A_{n}^1 = A_0 + A_1 + \cdots A_n \\ \vdots \\
+A_{n}^{k+1} = A_{0}^k + A_{1}^k + \cdots + A_{n}^k
+\end{align*}
+
+And $E_{n}^k := A_{n}^k$ for $\sum a_n = 1+0+0+ \cdots$ ie. 
+$$E_{n}^k = \binom{n+k}{k} $$
+
+If $C_n^k \underset{n \to \infty}{\to} A$, we say the series is $(C,k)$-summable, with sum $A$
+We can rewrite this:
+\begin{align*}
+    C_n^k(A) = \binom{n+k}{k}^{-1}\sum_{v=0}^n\binom{n-v+k}{k}a_v \\= \sum_{v=0}^{n}\left(1-\frac{v}{n+1} \right )\left(1-\frac{v}{n+2} \right )\cdots\left(1-\frac{v}{n+k} \right )a_v
+\end{align*}
+
+We can consider the $(C,k)$-summability of series as a sequence of increasing subspaces, where the smallest contains all convergent series ie. $(C,0)$-summable series, the next $(C,1)$-summable sequences (the default Cesàro summation), and we have:
+$$(C, k)\text{-summable}\Rightarrow (C,l)\text{-summable} \text{ for } l>k$$ and $$\underset{N\to\infty}{\lim} C_N^k = A$$ for all k where this limit exists. We can see a nice proof of this here \cite{arizona}.
+
+\begin{theorem}[The Equivalence Theorem]
+    $(C,k)$ and $(H,k)$ are equivalent: a series is $(C,k)$-summable if and only if it is $(H,k)$-summable.
+\end{theorem}
+The proof of this goes beyond the scope of this paper, but see Hardy's proof in \cite{hardy}, pg. 103.
+
+
+\subsection{Riesz's Method}
+For $\lambda_n$ satisfying $0 \leq \lambda_0 < \lambda_1 < \cdots$ and $\lambda \to \infty$ such that:
+
+$$A_\lambda(x)=\begin{cases} a_0+a_1+\cdots+a_n = s_n,&\lambda_n<x\leq\lambda_{n+1} \\0&x\leq\lambda_0\end{cases}$$
+(with $k > 0$ and a continuous parameter $\omega$)
+
+Define:
+$$ A^k_\lambda(\omega) := \frac{k}{\omega}\int_{0}^{\omega}A_\lambda(x)(\omega-x)^{k -1}dx \Leftrightarrow $$
+\begin{equation}
+    A_\lambda^k(\omega) = \sum_{\lambda_n \leq \omega}\left (1-\frac{\lambda_n}{\omega} \right )^k a_n
+\end{equation}
+
+If $A_\lambda^k\underset{\omega\to\infty }{\to}s $ then we say the sequence is Riesz summable with $\sum a_n = s \ (R,\lambda, \kappa)$.
+
+This is a stronger and more general summation method than Cesàro summation, and is commonly used for \textbf{Dirichlet Series}. We are introducing it so that we can reconsider our sum in Riesz form, due to an equivalence given in the below theorem.
+
+\begin{theorem}
+    For an integer k, a series is $(C,k)$-summable if and only if it is $(R,n,k)$-summable.
+\end{theorem}
+
+For proof see \cite{hardy}, pg. 113.
+
+\section{Convergence using Cesàro Summation}
+\subsection{Proving Convergence}
+The sequence we are considering $(3.1)$ is:
+\begin{equation}
+    M_{a,s} := \sum_{(i,j,k)\in \mathbb{Z}^{3}}\frac{(-1)^{i+j+k}}{(a^{2}+i^{2}+j^{2}+k^{2})^{s}}
+\end{equation}
+
+
+Which, considering expanding spheres of radius n, and letting C(n) as defined above in section $4$, we can rewrite as:
+$$M_{a,s} = \sum_{n=1}^{\infty}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}}$$
+
+We have already seen that this series diverges for $(C,0)$ in section $4$. The series converges in $(C,1)$, ie. 
+\begin{equation}
+    C_N^1 := \sum_{v=0}^{n}\left(1-\frac{v}{n+1} \right )a_v \underset{N\to\infty}{\to} M_{(a,s)}
+\end{equation}
+
+
+however the proof goes beyond the scope of this paper. See proof \cite{thepaper}, section $(3.2)$.
+
+For the purposes of simply finding the Madelung constant (which is the same regardless of our choice of k, assuming the limit exists), it suffices to prove $(C, 2)$ convergence for $s > 0$:
+
+$$C_{N}^{2}(a,s) \underset{N \to \infty}{\rightarrow} M_{a,s} \Leftrightarrow M_{a,s} = \sum_{n=1}^{\infty}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}}\ (C,n)$$
+
+From our prior definitions:
+$$C_N^2 = \sum_{v=0}^{n}\left(1-\frac{v}{n+1} \right )\left(1-\frac{v}{n+2} \right )a_v$$ 
+
+Using Hardy's proof \cite{hardy}, we can convert this into a Riesz summation (where  $0 < \theta \leq 1$):
+\begin{equation}
+    R_N^2 = \sum_{n \leq \omega}\left (1-\frac{n}{\omega} \right )^2 a_n = \sum_{n \leq N + \theta}\left (1-\frac{n}{N + \theta} \right )^2 a_n
+\end{equation}
+
+\begin{theorem}
+    $(6.1)$ is $(C,2)$-summable.
+    $$\sum_{n \leq N + \theta}\left (1-\frac{n}{N + \theta} \right )^2 a_n \underset{N\to\infty}{\to} M_{(a,s)}$$
+\end{theorem}
+\begin{proof}
+This follows the proof in \cite{thepaper}, with an extra parameter $\theta$ in order to have well-defined Cesàro-Riesz equivalence.
+    Let us define the following sets, with $Q$, $B$ as in section $(3)$:
+    $$D_{N} := \bigcup_{\substack{(I,J,K) \in \mathbb{Z}^{3} \\Q_{I,J,K} \subset B_{N+\theta}}}Q_{I,J,K} \ \ D_{N}^{'} := B_{N+\theta}/D_{N}$$
+
+    Then we can split our sum:
+    \begin{align*}
+\underset{(6.3)}{R_{N}^{2}(a,s)} = \sum_{(i,j,k) \in B_{N+\theta} \cap \mathbb{Z}^{3}}\left (1-\frac{n}{N+\theta}\right )^{2}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}} \\
+= \underbrace{\sum_{(i,j,k) \in D_{N} \cap \mathbb{Z}^{3}}\left (1-\frac{n}{N+\theta}\right )^{2}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}}}_{U_{N}(a,s)}+\underbrace{\sum_{(i,j,k) \in D_{N}^{'} \cap \mathbb{Z}^{3}}\left (1-\frac{n}{N+\theta}\right )^{2}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}}}_{V_{N}(a,s)}
+    \end{align*}
+Bounding $V_{N}$:
+
+Using $\sqrt{N+\theta} - \sqrt{3} \leq \sqrt{i^2 + j^2 + k^2} \leq \sqrt{N+\theta}$ (as $\sqrt{3}$ is the length of the diagonal of a unit cube), and $D'_M := B_{N+\theta}/D_{N-\sqrt3}$:
+$$\left | V_{N}(a,s) \right | \leq \left(1-\frac{(\sqrt{N+\theta}-\sqrt{3})^2}{N+\theta} \right )^2 \frac{|D_{M}^{'}\cap \mathbb{Z}^3|}{(a^2 +(\sqrt{N+\theta}-\sqrt{3})^2)^s}$$
+
+Using volume bounds (as we are considering unit cubes in between two spheres):
+$$|D_{M}^{'}\cap \mathbb{Z}^3| \leq \frac{4}{3}\pi \left((\sqrt{N+\theta}+\sqrt{3})^3 - (\sqrt{N+\theta}-\sqrt{3})^3\right) \leq C(N+\theta)^\frac{1}{2}$$
+We can also bound the first part of the product:
+$$\left|\left(1-\frac{(\sqrt{N+\theta}-\sqrt{3})^2}{N+\theta} \right )^2 \right|= \left | \left ( \frac{N-(N-2\sqrt{3N+\theta} +\sqrt3)}{N+\theta} \right )^2 \right | \leq \left | \frac{C'}{\sqrt N+\theta} \right |^2 \leq \frac{C''}{N+\theta}$$
+
+$$\therefore \ | V_{N}(a,s) | \leq \frac{C''}{(N+\theta)^\frac{3}{2}}\frac{C}{(a^2 +(\sqrt{N+\theta}-\sqrt{1})^2)^s} \underset{N \to \infty}{\rightarrow} 0$$
+Bounding $U_{N}$:
+
+\begin{align*}
+\left(1+\frac{n}{N+\theta} \right )^2 = \left(1+\frac{a^2}{N+\theta} - \frac{n+a^2}{N+\theta} \right )^2 = \left(1+\frac{a^2}{N+\theta} \right )-2\left(1+\frac{a^2}{N+\theta} \right )\left(\frac{n+a^2}{N+\theta} \right )+\left(\frac{n+a^2}{N+\theta} \right )^2\\
+\therefore 
+\sum_{(i,j,k) \in D_{N}^{'} \cap \mathbb{Z}^{3}}\left (1-\frac{n}{N+\theta}\right )^{2}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}} = \left(1+\frac{a^2}{N+\theta} \right )^2\sum_{(i,j,k) \in D_{N}^{'} \cap \mathbb{Z}^{3}}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s}}\\ -\frac{2}{N+\theta}\left(1+\frac{a^2}{N+\theta} \right )\sum_{(i,j,k) \in D_{N}^{'} \cap \mathbb{Z}^{3}}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s-1}}\\+\frac{1}{(N+\theta)^2}\sum_{(i,j,k) \in D_{N}^{'} \cap \mathbb{Z}^{3}}(-1)^{n}\frac{C(n)}{(a^{2}+n)^{s-2}} \\ 
+\underset{\text{(3.2)}}{=} \left(1+\frac{a^2}{N+\theta} \right )^2\sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s)\\-\frac{2}{N+\theta}\left(1+\frac{a^2}{N+\theta} \right )\sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s-1)\\+\frac{1}{(N+\theta)^2}\sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s-2)
+\end{align*}
+
+Where we have used the definition of $(E_{i,j,k})$ from section $3$ (this causes our summation slice $D'_N$ to halve).
+
+We can now use come other results from section $3$ to bound:
+\begin{align*}
+\left | \sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s) \right |\underset{\substack{N \to \infty\\ \text{(3.5)}}}{\to} M_{(a,s)} \\
+\left | \sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s-1) \right | \underset{\text{(3.3),(3.7)}}{\leq} CN^{1-s}\underset{N\to\infty}\therefore \text{Term in RHS}{\to} 0\\
+\left | \sum_{(i,j,k) \in \frac{1}{2}D_{N}^{'} \cap \mathbb{Z}^{3}}E_{i,j,k}(a,s-2) \right | \underset{\text{(3.3),(3.7)}}{\leq} CN^{2-s} \underset{N\to\infty}\therefore \text{Term in RHS}{\to} 0
+\end{align*}
+
+Therefore $\therefore R_N^k \underset{N \to \infty}{\to} M_{(a,s)}$ as required.
+\end{proof}
+
+
+\subsection{Numeric estimate of the rate of convergence of  Cesàro Summation}
+We would like to graphically illustrate and compare the convergence behavior of the first and second order Cesàro summations,  $C_N^1$ and $C_N^2$, given parameters $a=0$ and $s=\frac{1}{2}$, as shown on the next page.
+
+\clearpage
+%3d_1st_cesaro 
+\begin{figure}[htp]
+\centering
+\captionsetup{width=0.6\textwidth}
+\includegraphics[width=0.6\textwidth]{3d_1st_cesaro_partial_sum.png}  
+\caption{A figure plotting $N$th partial sums of first order Cesàro summation $(6.2)$ against N up to $\mathrm{N}=10000$.}
+\end{figure}
+
+
+%3d_2nd_cesaro
+\begin{figure}[htp]
+\centering
+\captionsetup{width=0.6\textwidth}
+\includegraphics[width=0.6\textwidth]{3d_2nd_cesaro_partial_sum.png}  
+\caption{A figure plotting $N$th partial sums of second order Cesàro summation $(6.3)$ against N up to $\mathrm{N}=10000$.}
+\end{figure}
+
+
+We can see both first and second order Cesàro summations converge towards the Madelung constant, denoted $M_{0,1 / 2}=-1.74756 \ldots$ However, contrasted with summation by expanding squares, a characteristic feature of both Cesàro summations is the presence of oscillation in the absolute error. This oscillation resonates with the inherent behavior of the function $C(n)$, which quantifies the number of ways an integer $n$ can be represented as the sum of three squares. Specifically, $C(n)$ does not demonstrate any discernible, elementary pattern or periodicity.
+
+In addition, we see the first order Cesàro summation exhibits a significantly slower convergence compared to the second order Cesàro summation. In order to compare the rate of convergence of them quantitatively, it is crucial, to consider the implications arising from the decreasing orders of magnitude of absolute errors as N becomes large and the potential for misinterpretation prompted by different scales on the y-axis in Figure 6.1 and Figure 6.2.
+
+
+To address these challenges, we adopt a log-log scale for our graphical analysis. Subsequently, we aim to visualize the log errors of the $N$th partial sums for both first and second order Cesàro summations, plotted against $ \log _{10} N $ as follows. 
+%3d_cesaro_log_res
+\begin{figure}[htp]
+\centering
+\captionsetup{width=0.8\textwidth}
+\includegraphics[width=0.9\textwidth]{3d_cesaro_log_res.png}  
+\caption{A figure plotting the log errors of $N$th partial sums of first and second  Cesàro summation against $ \log _{10} N $ up to $\mathrm{N}=10000$.}
+\end{figure}
+\newpage
+
+It is observed that the log errors associated with both the first and second order Cesàro summations are upper-bounded by a linear function of $\log _{10} N$, with negative gradient. The negative gradient associated with the second order Cesàro summation is approximately twice that of the first order, which verifies that $C_N^2$ converges essentially faster than $C_N^1$. 
+
+
+We seek to construct this linear function. Compared with Figure 3.7, noticeable fluctuations are observed and the majority of data points exhibit negative residuals. These points residing between the envelopes in Figures 6.1 and 6.2, with lower absolute errors, are not representative for the construction of this linear function. To address this concern, our strategy pivots to utilizing solely the local maximum points, which represent points situated on the envelopes in Figures 6.1 and 6.2. We then perform unweighted linear regression on the local maximum points and discover that the linear upper-bound line possesses negative gradients of -0.5031 and -0.9966, respectively. 
+
+ Based on the gradients we found and Theorem 3.10, we make the following conjecture.
+
+
+\begin{conjecture}
+For the approximations of the Madelung constant using the Nth partial sum of $C_N^1$ and $C_N^2$, the absolute error is $O(n^{-0.5031})$ and $O(n^{-0.9966})$ respectively. This indicates that the rate of convergence decrease as N increases under both cases.
+\end{conjecture}
+ 
+
+\section{Application}
+\subsection{Divergence of series}
+
+The usage of Cesàro summation extends beyond its application in handling divergent series and can be used for many different purposes. A finite value can be designated for an untypically convergent series through this method, and the process of computing Cesàro means through this method involves obtaining average values for the first n partial sums. 
+Consider the series:
+\\
+1 - 2 + 4 - 8 +16- ...
+\\
+This particular series fails to converge since its term's absolute value does not approach zero. However, applying Cesàro summation allows us to calculate a finite value for the sum of the series. By taking into account the Cesàro means of our partial sums we are able to do this:
+\\
+$s_1$ = 1
+\\
+$s_2$ = (1-2)/2 = -1/2
+\\
+$s_3$ = (1-2+4)/3 = 1/3
+\\
+$s_4$ = (1-2+4-8)/4 = -1/2
+...
+
+It can be seen that by using the Cesàro method for finding partial sums we reach a conclusion that converges to 1/3. In light of this, we can characterize the series as
+1 - 2 + 4 - 8 + ... = 1/3
+Therefore,we can use Cesàro summation in order to assign a finite value to the sum of this series.
+
+
+\subsection{Lattice points}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\linewidth]{gausspic.jpg}
+    \label{gauss circle problem}
+\end{figure}
+
+Lattice sum also has a few applications. For instance, lattice sums can be used to estimate the number of lattice points in a given region of the plane. Specifically, for a convex region with finite area $\mathcal{L}$, the lattice sum
+
+$$
+\sum_{n\in\mathcal{L}} 1
+$$
+
+counts the number of lattice points in $\mathcal{L}$. However, this sum can be very difficult to calculate exactly when the number of lattice points in $\mathcal{L}$ is very large.Instead, by using the convergence of the lattice sum we can obtain an estimate of the number of lattice points in $\mathcal{L}$. We can change the lattice sum into other form
+$$
+\sum_{n\in\mathcal{L}} 1 = \sum_{n\in\mathcal{L}} \chi_\mathcal{L}(n) = \frac{1}{\text{area}(\mathcal{L})} \sum_{m\in\mathbb{Z}^2} \hat{\chi}_\mathcal{L}(m).
+$$
+where $\hat{f}(m)$ is the Fourier transform of $f(x)$ from \cite{gruber1987lattice}. The lattice sum over all points in $\mathbb{Z}^2$ approaches a constant value as $M$ increases.
+And then, estimating the lattice sum is possible by truncating the inner summation at a sufficiently big number:
+$$
+\sum_{n\in\mathcal{L}} 1 \approx \frac{1}{\text{area}(\mathcal{L})} \sum_{|m|\leq M} \hat{\chi}_\mathcal{L}(m).
+$$
+This approximation can be made even more accurate with an even bigger $M$.By employing the Fast Fourier Transform (FFT), an efficient calculation of the lattice sum inside the integral is possible. Therefore, this method provides a practical way to estimate the number of lattice points in a given region $\mathcal{L}$ of the plane.
+\\
+\subsection{Green's Function}
+Green's function can be exploited to solve differential equations and be useful in physics such as  electrodynamics, quantum field theory etc..Under some certain conditions,it becomes useful when we consider how we represent these functions by summing over given points on a lattice. This method of using lattice sum offers a more efficient and insightful way to solve differential equations in some settings.
+\\
+Consider the Poisson equation on a two-dimensional infinite periodic lattice:
+$$
+\nabla^2 G(\mathbf{r-r'}) = -\delta(\mathbf{r-r'}),
+$$
+
+where $G(\mathbf{r-r'})$ is the Green's function to be determined, $\nabla^2$ is the Laplace operator, and $\delta(\mathbf{r-r'})$ is the Dirac delta function from \cite{ashcroft1976solid}.
+Since it is the case of periodic lattice, we can transform the Green's function to a lattice sum:
+$$
+G(\mathbf{r-r'}) = \sum_{\mathbf{R} \in \mathcal{L}} G_0(\mathbf{r-r'} - \mathbf{R}),
+$$
+where  $\mathbf{R}$ is a lattice vector in the lattice $\mathcal{L}$.
+The properties of convergence for the lattice sum are crucial in understanding the behavior of the Green's function and finding a solution for the Poisson equation in the periodic lattice.In cases where free-space Green's functions decay rapidly, the lattice sum converges swiftly and portrays an accurate depiction of the Green's function under the periodic setting.After obtaining the Green's function, it becomes possible to solve the Poisson equation for a particular distribution in the periodic lattice. This solution is vital in diverse applications in many physical problems.
+\\
+In conclusion, lattice sums are important for representing Green's functions and solving differential equation in periodic conditions.
+\newpage
+\printbibliography
+
+\end{document}
